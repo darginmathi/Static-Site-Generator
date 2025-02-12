@@ -1,7 +1,7 @@
 import unittest
 
-from htmlnode import HTMLNode
-from htmlnode import LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
+
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -17,6 +17,8 @@ class TestHTMLNode(unittest.TestCase):
         node = HTMLNode(props={})
         self.assertEqual(node.props_to_html(), "")
         
+
+class TestLeafNode(unittest.TestCase):        
     def test_tag_p(self):
         node = LeafNode(tag="p", value="Hello, World")
         self.assertEqual(node.to_html(), "<p>Hello, World</p>")
@@ -35,6 +37,54 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(node.to_html(), "Just text")
     
     
+class TestParentNode(unittest.TestCase):
+    def test_tag_child(self):
+        node = ParentNode(
+    "p",
+    [
+        LeafNode("b", "Bold text"),
+        LeafNode(None, "Normal text"),
+        LeafNode("i", "italic text"),
+        LeafNode(None, "Normal text"),
+    ],
+)
+        self.assertEqual(node.to_html(), "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>")
+        
+    def test_tag_child_props(self):
+        node = ParentNode(
+    "p",
+    [
+        LeafNode("b", "Bold text"),
+        LeafNode(None, "Normal text"),
+        LeafNode("i", "italic text"),
+        LeafNode(None, "Normal text"),
+    ],
+    props={"href": "https://example.com"}
+)
+        self.assertEqual(node.to_html(), '<p href="https://example.com"><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>')
+        
+    def test_nested_parent_nodes(self):
+        node = ParentNode(
+            "div",
+            [
+                ParentNode(
+                    "ul",
+                    [
+                        LeafNode("li", "Item 1"),
+                        LeafNode("li", "Item 2"),
+                    ],
+                    props={"class": "list"}
+                ),
+                LeafNode("p", "Footer text"),
+            ],
+        )
+        self.assertEqual(node.to_html(),'<div><ul class="list"><li>Item 1</li><li>Item 2</li></ul><p>Footer text</p></div>')
+        
+    def test_no_children(self):
+        with self.assertRaises(ValueError):
+            node = ParentNode("div", [])
+            node.to_html()
+
 
 if __name__ == "__main__":
     unittest.main()
