@@ -43,7 +43,7 @@ class ParentNode(HTMLNode):
         
         if self.tag is None:
             raise ValueError ("no tag")
-        if self.children is None:
+        if self.children == []:
             raise ValueError ("no children")
         return f"<{self.tag}{props_html}>{children_html}</{self.tag}>"
     
