@@ -1,6 +1,7 @@
 import unittest
+from pprint import pprint
 
-from text import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from text import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 from textnode import TextNode, TextType
 
 class TestText(unittest.TestCase):
@@ -27,6 +28,7 @@ class TestText(unittest.TestCase):
         node = TextNode("", TextType.TEXT)
         result = split_nodes_delimiter([node], "`", TextType.CODE)
         expected = [node]  # Empty node remains unchanged
+        print(result)
         self.assertEqual(result, expected)
 
     def test_empty_delimiter(self):
@@ -52,6 +54,7 @@ class TestExtract(unittest.TestCase):
             ],
             matches,
         )
+        
 class TestSplitImage(unittest.TestCase):
     def test_split_nodes_image_no_images(self):
         nodes = [TextNode("This is a text without images.", TextType.TEXT)]
@@ -132,6 +135,49 @@ class TestSplitLink(unittest.TestCase):
         self.assertEqual(split_nodes_link(nodes), expected)
         
 
+class TestTestToNodes(unittest.TestCase):
+    def test_one_line(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        expected = [
+        TextNode("This is ", TextType.TEXT),
+        TextNode("text", TextType.BOLD),
+        TextNode(" with an ", TextType.TEXT),
+        TextNode("italic", TextType.ITALIC),
+        TextNode(" word and a ", TextType.TEXT),
+        TextNode("code block", TextType.CODE),
+        TextNode(" and an ", TextType.TEXT),
+        TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+        TextNode(" and a ", TextType.TEXT),
+        TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertEqual(text_to_textnodes(text), expected)
+
+    def test_multiple_links_and_images(self):
+        text = "Here is [link1](http://example1.com), [link2](http://example2.com), and ![image1](http://example.com/image1.png)."
+        result = text_to_textnodes(text)
+        expected = [
+            TextNode("Here is ", TextType.TEXT),
+            TextNode("link1", TextType.LINK, "http://example1.com"),
+            TextNode(", ", TextType.TEXT),
+            TextNode("link2", TextType.LINK, "http://example2.com"),
+            TextNode(", and ", TextType.TEXT),
+            TextNode("image1", TextType.IMAGE, "http://example.com/image1.png"),
+            TextNode(".", TextType.TEXT),
+        ]
+        self.assertEqual(result, expected) 
+        
+    def test_mixed_markdown(self):
+        text = "**Important:** Use the `code block` inside *italic* notes."
+        expected = [
+            TextNode("Important:", TextType.BOLD),
+            TextNode(" Use the ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" inside ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" notes.", TextType.TEXT)
+        ]
+        self.assertEqual(text_to_textnodes(text), expected)    
+        
         
 if __name__ == "__main__":
     unittest.main()
