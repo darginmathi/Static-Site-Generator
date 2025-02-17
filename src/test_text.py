@@ -28,7 +28,6 @@ class TestText(unittest.TestCase):
         node = TextNode("", TextType.TEXT)
         result = split_nodes_delimiter([node], "`", TextType.CODE)
         expected = [node]  # Empty node remains unchanged
-        print(result)
         self.assertEqual(result, expected)
 
     def test_empty_delimiter(self):
