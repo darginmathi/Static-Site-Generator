@@ -1,6 +1,9 @@
 from textnode import TextNode
 from textnode import TextType
 
+def copy_static_to_public():
+    
+
 def main():
     test = TextNode("text node", TextType.ITALIC, "url.com")
     print(repr(test))
