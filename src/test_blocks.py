@@ -1,9 +1,19 @@
+from traceback import print_tb
 import unittest
 from pprint import pprint
 
 from blocks import markdown_to_blocks, block_to_block_type, markdown_to_html_node
 from text import TextNode
 from htmlnode import HTMLNode, LeafNode
+
+
+def print_tree(node, level=0):
+        indent = "  " * level
+        tag = node.tag or "text"
+        value = f'"{node.value}"' if node.value else ""
+        print(f"{indent}{tag}: {value}")
+        for child in node.children:
+            print(child, level + 1)
 
 class TestSplitBlocks(unittest.TestCase):
     def test_example_case(self):
@@ -63,14 +73,6 @@ code block here
 ```"""
         node = markdown_to_html_node(markdown)
         print_tree(node)
-        
-    def print_tree(node, level=0):
-        indent = "  " * level
-        tag = node.tag or "text"
-        value = f'"{node.value}"' if node.value else ""
-        print(f"{indent}{tag}: {value}")
-        for child in node.children:
-            print_tree(child, level + 1)
         
         
     def test_paragraph(self):

@@ -21,3 +21,18 @@ def copy_dir(from_dir, to_dir):
                 print(f"{src_path} is a dir") 
             except Exception as e:
                 print(f"error processing dir {src_path}; {e}")
+                
+                
+def clear_dir(dir):
+    if os.path.exists(dir):
+        print("Folder already exists!")
+        try:
+            shutil.rmtree(dir, ignore_errors=False, onerror=None)
+            print("removed public dir")
+        except Exception as e:
+            print(f"error while removing dir{e}")
+    try:        
+        os.makedirs(dir)
+        print(f'dir created: {dir}')
+    except Exception as e:
+        print(f"error while creating dir{e}")
